@@ -47,7 +47,7 @@
   </form>
   @endif
     
-
+<!--
   <p>Lista de cuentas de Envialo Simple ya vinculadas:</p>
   <table class="table table-bordered">
     <thead>
@@ -66,10 +66,9 @@
         </td>
       </tr>
       @endforeach
-      
     </tbody>
   </table>
-  
+  -->
   
 	
 </div>

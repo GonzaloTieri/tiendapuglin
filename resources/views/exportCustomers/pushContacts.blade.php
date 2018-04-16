@@ -27,9 +27,10 @@
 	@endif
 	
 
-<div>
+<!-- div>
     <input type="submit" value="Volver al admin">
-</div>
+</div -->
+
 </div>
 
 @stop

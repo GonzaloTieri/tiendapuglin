@@ -49,15 +49,27 @@
         <td> 
         <div class="row">
           <div class="col">
-            <button type="button" class="btn btn-danger btn-sm">Borrar</button>
+          <form action="/tiendaNuebePlugin/public/export" method="POST">
+            <input type="hidden" value="{{$apiKey['apikey']}}" name="apikey" />
+            <input type="hidden" value="{{$apiKey['id']}}" name="accountId" />
+            <input type="hidden" value="true" name="delete" />
+
+            <input type="hidden" value="{{$tokenType}}" name="tokenType" />
+            <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
+            <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
+
+            <input type="submit" class="btn btn-danger btn-sm" value="Borrar">
+          </form>
           </div>
           <div class="col">
           <form action="/tiendaNuebePlugin/public/main" method="POST">
             <input type="hidden" value="{{$apiKey['apikey']}}" name="apikey" />
+            <input type="hidden" value="{{$apiKey['id']}}" name="tiendaId" />
+
             <input type="hidden" value="{{$tokenType}}" name="tokenType" />
             <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
             <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
-            
+
             <input type="submit" class="btn btn-primary btn-sm" value="Exportar">
           </form>
           </div>

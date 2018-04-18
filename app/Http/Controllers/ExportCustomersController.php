@@ -3,45 +3,65 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Http\Request;
 
 class ExportCustomersController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
+        if ($request->isMethod('post')) {
+             $token['user_id'] = $_POST['tiendaId'];
+             $token['access_token'] = $_POST['tiendaToken'];
+             $token['token_type'] = $_POST['tokenType'];
+
+             if(isset($_POST['delete'])){
+                $accountId = $_POST['accountId'];
+                $account = \App\Models\EnvialoAccount::find($accountId);
+                
+                if($account) {
+                   $account->delete();
+                }
+             }
+             
+
+        } else {
+            $token = $this->getToken($_GET['code']);
+        }
+
         $data['envialosApiKeys'] = [];
 
-        if(isset($_GET['code'])) {
-            $token = $this->getToken($_GET['code']);
-            if(!isset($token['error'])) { //!isset($token['error'])
+        //if(isset($_GET['code'])) {
+            
+        if(!isset($token['error'])) { //!isset($token['error'])
 
-                //$data['tiendaId'] = 789; // $token['user_id'];
-                $data['tiendaId'] = $token['user_id'];
-                
-                //$data['tiendaToken'] = "aklsd233k4oi233kl2"; //$token['access_token'];
-                $data['tiendaToken'] = $token['access_token'];
+            //$data['tiendaId'] = 789; // $token['user_id'];
+            $data['tiendaId'] = $token['user_id'];
+            
+            //$data['tiendaToken'] = "aklsd233k4oi233kl2"; //$token['access_token'];
+            $data['tiendaToken'] = $token['access_token'];
 
-                //$data['tokenType'] = "bearer"; //$token['token_type'];
-                $data['tokenType'] = $token['token_type'];
+            //$data['tokenType'] = "bearer"; //$token['token_type'];
+            $data['tokenType'] = $token['token_type'];
 
 
-                $tienda =  \App\Models\Tienda::where('tiendaId',$data['tiendaId'])->first();
-                if($tienda){
-                    $accounts = $tienda->envialoAccounts;
-                    $data['envialosApiKeys'] = $accounts ? $accounts : [] ;
-                } else {
-                    $tienda = new \App\Models\Tienda();
-                    $tienda->tiendaId = $data['tiendaId'];
-                    $tienda->save();
-                }
-                
+            $tienda =  \App\Models\Tienda::where('tiendaId',$data['tiendaId'])->first();
+            if($tienda){
+                $accounts = $tienda->envialoAccounts;
+                $data['envialosApiKeys'] = $accounts ? $accounts : [] ;
             } else {
-                $data['error'] = "Error Token";    
+                $tienda = new \App\Models\Tienda();
+                $tienda->tiendaId = $data['tiendaId'];
+                $tienda->save();
             }
-
+            
+        } else {
+            $data['error'] = "Error Token";    
+        }
+/*
         } else {
             $data['error'] = "Codigo Inexistente";
         }
-
+*/
         return view('exportCustomers.index', $data);
     }
 
@@ -125,6 +145,10 @@ class ExportCustomersController extends BaseController
         $tokenType = $_POST['tokenType'] ;
         $tiendaId = $_POST["tiendaId"];
         $mailListID = $_POST['mailListID'];
+
+        $data['tiendaToken'] = $_POST['tiendaToken'];
+        $data['tokenType'] = $_POST['tokenType'] ;
+        $data["tiendaId"] = $_POST["tiendaId"];
 
         $tienda = \App\Models\Tienda::where('tiendaId', $tiendaId)->first();
         $account = $tienda->envialoAccounts->where('apikey', $apikeyEnvialo);

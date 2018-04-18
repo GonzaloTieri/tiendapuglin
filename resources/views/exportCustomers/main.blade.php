@@ -32,8 +32,13 @@
 				@endforeach
 				</select>
 			</div>
-			<input type="hidden" value="{{$code}}" name="code" />
-			<input type="hidden" value="{{$apiKeyEnvialo}}" name="apiKeyEnvialo" />
+			
+			<input type="hidden" value="{{$apikey}}" name="apikey" />
+            <input type="hidden" value="{{$tokenType}}" name="tokenType" />
+            <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
+            <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
+
+
 			<input type="submit" class="btn btn-primary mb-2" value="Continuar">
 		</form>
 	@endif

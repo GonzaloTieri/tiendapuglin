@@ -17,3 +17,5 @@ Route::get('/', function () {
 Route::get('export', 'ExportCustomersController@index')->middleware('cors');
 Route::post('main', 'ExportCustomersController@main')->middleware('cors');
 Route::post('pushContacts', 'ExportCustomersController@pushContacts');
+Route::post('agregarcuenta', 'ExportCustomersController@addEnvialoAccount');
+

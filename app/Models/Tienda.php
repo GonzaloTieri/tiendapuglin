@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tienda extends Model
 {
-    public $tiendaId;
     public $timestamps = false;
+    public function envialoAccounts()
+    {
+        return $this->hasMany('\App\Models\EnvialoAccount');
+    }
+    
 }

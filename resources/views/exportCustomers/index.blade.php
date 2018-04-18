@@ -24,31 +24,17 @@
   </div>
   @else
   
-
-    <div><h3> Agregar nueva cuenta de Envialo Simple</h3>  </div>
-
-
-    
-  <form action="/tiendaNuebePlugin/public/main" method="POST" class="form-inline">
-    <div class="form-group mb-2">
-     
-      <input type="text" readonly class="form-control-plaintext" value="API Key">
-    </div>
-    <div class="form-group mx-sm-3 mb-2">
-    
-      <input type="text" class="form-control" placeholder="Api key" name="apikey" required>
-    </div>
-    <input type="hidden" value="{{$code}}" name="code" />
-    <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
-    
-    <input type="hidden" value="1" name="new" />
-
-    <input type="submit" class="btn btn-primary mb-2" value="Agregar Cuenta">
-  </form>
-  @endif
-    
-<!--
   <p>Lista de cuentas de Envialo Simple ya vinculadas:</p>
+  <p>
+    <form action="/tiendaNuebePlugin/public/agregarcuenta" method="POST">
+      <input type="hidden" value="{{$tokenType}}" name="tokenType" />
+      <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
+      <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
+      
+      <input type="submit" class="btn btn-primary btn-sm" value="Agregar Cuenta">
+    </form>   
+   </p>
+  
   <table class="table table-bordered">
     <thead>
       <tr>
@@ -61,14 +47,41 @@
       <tr>
         <td>{{$apiKey['apikey']}}</td>
         <td> 
-          <button type="button" class="btn btn-danger btn-sm">Borrar</button>
-          <button type="button" class="btn btn-primary btn-sm">Exportar</button>
+        <div class="row">
+          <div class="col">
+            <button type="button" class="btn btn-danger btn-sm">Borrar</button>
+          </div>
+          <div class="col">
+          <form action="/tiendaNuebePlugin/public/main" method="POST">
+            <input type="hidden" value="{{$apiKey['apikey']}}" name="apikey" />
+            <input type="hidden" value="{{$tokenType}}" name="tokenType" />
+            <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
+            <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
+            
+            <input type="submit" class="btn btn-primary btn-sm" value="Exportar">
+          </form>
+          </div>
+        </div>
         </td>
       </tr>
       @endforeach
+
+
+
+
+
+
+
+
+
     </tbody>
   </table>
-  -->
+  
+
+   
+  @endif
+    
+
   
 	
 </div>

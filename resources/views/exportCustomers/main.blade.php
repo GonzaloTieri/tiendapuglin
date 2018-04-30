@@ -21,7 +21,7 @@
   	@else
 
     	<div> <h3> Seleccione un lista para exportar los contactos </h3>  </div>
-		<form action="/tiendaNuebePlugin/public/pushContacts" method="POST" class="form-inline">
+		<form action="/pluginTN/public/pushContacts" method="POST" class="form-inline">
 			<div class="form-group mb-2">
 				<input type="text" readonly class="form-control-plaintext" value="Lista a exportar: ">
 			</div>

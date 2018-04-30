@@ -4,90 +4,99 @@ namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
+use Cookie;
 
 class ExportCustomersController extends BaseController
 {
     public function index(Request $request)
     {
-        if ($request->isMethod('post')) {
-             $token['user_id'] = $_POST['tiendaId'];
-             $token['access_token'] = $_POST['tiendaToken'];
-             $token['token_type'] = $_POST['tokenType'];
-
-             if(isset($_POST['delete'])){
-                $accountId = $_POST['accountId'];
-                $account = \App\Models\EnvialoAccount::find($accountId);
-                
-                if($account) {
-                   $account->delete();
-                }
-             }
-             
-
-        } else {
-            $token = $this->getToken($_GET['code']);
+        if(  (Cookie::get('tiendaId') === null ) ||
+             (Cookie::get('tiendaToken') === null ) || 
+             (Cookie::get('tokenType') === null )     ) {
+            if(isset($_GET['code'])){
+                $token = $this->getToken($_GET['code']);
+            } else {
+                $token['error'] = "No code";
+            }
+            
+            
+            if(!isset($token['error'])){
+                Cookie::queue('tiendaId', $token['user_id'], 60);
+                Cookie::queue('tiendaToken', $token['access_token'], 60);
+                Cookie::queue('tokenType', $token['token_type'], 60);
+            }
         }
 
-        $data['envialosApiKeys'] = [];
-
-        //if(isset($_GET['code'])) {
+        if(!isset($token['error'])) {
+            $tiendaId = Cookie::get('tiendaId') === null ? $token['user_id'] : Cookie::get('tiendaId') ;
+            $tiendaToken = Cookie::get('tiendaToken') === null ? $token['access_token'] : Cookie::get('tiendaToken');
+            $tokenType = Cookie::get('tokenType') === null ? $token['token_type'] : Cookie::get('tokenType') ;
             
-        if(!isset($token['error'])) { //!isset($token['error'])
-
-            //$data['tiendaId'] = 789; // $token['user_id'];
-            $data['tiendaId'] = $token['user_id'];
+            $tienda =  \App\Models\Tienda::where('tiendaId',$tiendaId )->first();
             
-            //$data['tiendaToken'] = "aklsd233k4oi233kl2"; //$token['access_token'];
-            $data['tiendaToken'] = $token['access_token'];
+            if ($request->isMethod('post')) {
+                $apikeyEnvialo =  $_POST['apikey'];
+                $account = $tienda->envialoAccounts->first();
+    
+                if($account === null ) {
+                    $account = new \App\Models\EnvialoAccount();
+                    $account->tienda_id = $tienda->id;
+                } 
+                
+                $account->apikey = $apikeyEnvialo;
+                
+                $account->save();
+                $tienda =  \App\Models\Tienda::where('tiendaId',$tienda->tiendaId)->first();
 
-            //$data['tokenType'] = "bearer"; //$token['token_type'];
-            $data['tokenType'] = $token['token_type'];
+            }
 
+            if(isset($tienda)){
+                $account = $tienda->envialoAccounts->first();
+                if($account) {
+                    $data['envialoApiKey'] = $account->apikey ;
+                    $data['lists'] = $this->getList($account->apikey);
 
-            $tienda =  \App\Models\Tienda::where('tiendaId',$data['tiendaId'])->first();
-            if($tienda){
-                $accounts = $tienda->envialoAccounts;
-                $data['envialosApiKeys'] = $accounts ? $accounts : [] ;
+                } else {
+                    $data['lists']['item'] = [];
+                    $data['envialoApiKey'] = "" ;
+                }
+
             } else {
+                
+                dd($tienda);
+                
                 $tienda = new \App\Models\Tienda();
-                $tienda->tiendaId = $data['tiendaId'];
+                $tienda->tiendaId = $tiendaId;
                 $tienda->save();
             }
             
         } else {
-            $data['error'] = "Error Token";    
+            $data['error'] = "Error Token or code";    
         }
-/*
-        } else {
-            $data['error'] = "Codigo Inexistente";
-        }
-*/
-        return view('exportCustomers.index', $data);
+
+        return view('exportCustomers.index', $data)->withCookie(cookie('test', 'test', 45000));
     }
 
     public function addEnvialoAccount() {
-        $data = [
-            'tiendaToken' => $_POST['tiendaToken'],
-            'tokenType' => $_POST['tokenType'],
-            'tiendaId' => $_POST["tiendaId"]
-        ];
 
-        return view('exportCustomers.addEnvialoAccount', $data);
+        return view('exportCustomers.addEnvialoAccount');
     }
 
-    public function main()
+    public function getList($apikeyEnvialo)
     {
         // Consulto en la base de datos el api key de Envialo
         // Envilo Simple  https://app.envialosimple.com/<modulo>/<accion>?APIKey=<api key>&format=<format>
         // Clave API del usuario Env141051mpl3 = 8feb7abce2d6e753c7e545db37678baf6bb2a766b5a9883520bdd03e0b97370d01
 
-        $apikeyEnvialo = $_POST['apikey'];
-        $tiendaToken = $_POST['tiendaToken'];
-        $tokenType = $_POST['tokenType'] ;
-        $tiendaId = $_POST["tiendaId"];
+        //$apikeyEnvialo = $_POST['apikey'];
 
+        //$tiendaToken = $_POST['tiendaToken'];
+        //$tokenType = $_POST['tokenType'] ;
+        //$tiendaId = $_POST["tiendaId"];
+
+        $lists['item'] = [];
         $data = [];
-        $url = "http://app.envialosimple.com/maillist/list/?APIKey=$apikeyEnvialo&format=json"; // Listar Listas
+        $url = "http://app.envialosimple.com/maillist/list/?APIKey=$apikeyEnvialo&format=json&count=100"; // Listar Listas
 
         $curl = curl_init();
 
@@ -127,29 +136,31 @@ class ExportCustomersController extends BaseController
                 $lists = $response['root']["ajaxResponse"]['list'];
                 
                 $data = [   'lists' => $lists, 
-                            'apikey' => $apikeyEnvialo,
-                            'tiendaToken' => $tiendaToken,
-                            'tokenType' => $tokenType,
-                            'tiendaId' => $tiendaId
+                            //'apikey' => $apikeyEnvialo,
+                            //'tiendaToken' => $tiendaToken,
+                            //'tokenType' => $tokenType,
+                            //'tiendaId' => $tiendaId
 
                         ];
             }
         }
 
-        return view("exportCustomers.main", $data);
+        return $lists;
+        //return view("exportCustomers.main", $data);
     }
     public function pushContacts()
     {
+        
+        $tiendaToken = Cookie::get('tiendaToken') ;
+        $tokenType = Cookie::get('tokenType')   ;
+        $tiendaId =  Cookie::get('tiendaId') ;
         $apikeyEnvialo = $_POST['apikey'];
-        $tiendaToken = $_POST['tiendaToken'];
-        $tokenType = $_POST['tokenType'] ;
-        $tiendaId = $_POST["tiendaId"];
         $mailListID = $_POST['mailListID'];
 
-        $data['tiendaToken'] = $_POST['tiendaToken'];
-        $data['tokenType'] = $_POST['tokenType'] ;
-        $data["tiendaId"] = $_POST["tiendaId"];
-
+        //$data['tiendaToken'] = $_POST['tiendaToken'];
+        //$data['tokenType'] = $_POST['tokenType'] ;
+        //$data["tiendaId"] = $_POST["tiendaId"];
+/*
         $tienda = \App\Models\Tienda::where('tiendaId', $tiendaId)->first();
         $account = $tienda->envialoAccounts->where('apikey', $apikeyEnvialo);
 
@@ -160,7 +171,7 @@ class ExportCustomersController extends BaseController
             
             $account->save();
         } 
-
+*/
 
         $url = "https://api.tiendanube.com/v1/{$tiendaId}/customers";
         $accessToken = "{$tokenType} {$tiendaToken}";

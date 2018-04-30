@@ -23,79 +23,54 @@
     <strong>Error</strong> {{$error}}
   </div>
   @else
+
+
+
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link active" href="/pluginTN/public/export">Listas de Contactos</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">WebHooks</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/pluginTN/public/agregarcuenta">Configuracion</a>
+    </li>
+</ul>
+
+
+  <br>
+  <div><h3> Lista de la cuenta ya configuada: </h3>  </div>
   
-  <p>Lista de cuentas de Envialo Simple ya vinculadas:</p>
-  <p>
-    <form action="/tiendaNuebePlugin/public/agregarcuenta" method="POST">
-      <input type="hidden" value="{{$tokenType}}" name="tokenType" />
-      <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
-      <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
-      
-      <input type="submit" class="btn btn-primary btn-sm" value="Agregar Cuenta">
-    </form>   
-   </p>
   
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th>ApiKey</th>
-        <th>Acciones</th>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Contactos</th>
+        <th>Exportar</th>
       </tr>
     </thead>
     <tbody>
-      @foreach ($envialosApiKeys as $apiKey)
+      @foreach ($lists['item'] as $item)
       <tr>
-        <td>{{$apiKey['apikey']}}</td>
+        <td>{{$item['MailListID']}}</td>
+        <td>{{$item['Name']}}</td>
+        <td>{{$item['ActiveMemberCount']}}</td>
         <td> 
-        <div class="row">
-          <div class="col">
-          <form action="/tiendaNuebePlugin/public/export" method="POST">
-            <input type="hidden" value="{{$apiKey['apikey']}}" name="apikey" />
-            <input type="hidden" value="{{$apiKey['id']}}" name="accountId" />
-            <input type="hidden" value="true" name="delete" />
-
-            <input type="hidden" value="{{$tokenType}}" name="tokenType" />
-            <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
-            <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
-
-            <input type="submit" class="btn btn-danger btn-sm" value="Borrar">
+        <form action="/pluginTN/public/pushContacts" method="POST">
+            <input type="hidden" value="{{$item['MailListID']}}" name="mailListID" />
+            <input type="hidden" value="{{$envialoApiKey}}" name="apikey" />
+            <input type="submit" class="btn btn-primary btn-sm" value="Importar contactos de la tienda">
           </form>
-          </div>
-          <div class="col">
-          <form action="/tiendaNuebePlugin/public/main" method="POST">
-            <input type="hidden" value="{{$apiKey['apikey']}}" name="apikey" />
-            <input type="hidden" value="{{$apiKey['id']}}" name="tiendaId" />
-
-            <input type="hidden" value="{{$tokenType}}" name="tokenType" />
-            <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
-            <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
-
-            <input type="submit" class="btn btn-primary btn-sm" value="Exportar">
-          </form>
-          </div>
-        </div>
         </td>
       </tr>
       @endforeach
 
-
-
-
-
-
-
-
-
     </tbody>
-  </table>
-  
-
-   
+  </table>   
   @endif
-    
-
-  
-	
 </div>
 
 @stop

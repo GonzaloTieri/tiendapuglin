@@ -23,13 +23,23 @@
     <strong>Error</strong> {{$error}}
   </div>
   @else
-  
-
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a class="nav-link " href="/pluginTN/public/export">Listas de Contactos</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">WebHooks</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="/pluginTN/public/agregarcuenta">Configuracion</a>
+    </li>
+</ul>
+    <br>
     <div><h3> Agregar nueva cuenta de Envialo Simple</h3>  </div>
 
 
     
-  <form action="/tiendaNuebePlugin/public/main" method="POST" class="form-inline">
+  <form action="/pluginTN/public/export" method="POST" class="form-inline">
     <div class="form-group mb-2">
      
       <input type="text" readonly class="form-control-plaintext" value="API Key">
@@ -38,9 +48,6 @@
     
       <input type="text" class="form-control" placeholder="Api key" name="apikey" required>
     </div>
-    <input type="hidden" value="{{$tokenType}}" name="tokenType" />
-    <input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
-    <input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
 
     <input type="submit" class="btn btn-primary mb-2" value="Agregar Cuenta">
   </form>

@@ -26,14 +26,7 @@
 	</div>
 	@endif
 
-	<form action="/tiendaNuebePlugin/public/export" method="POST">
-
-		<input type="hidden" value="{{$tokenType}}" name="tokenType" />
-		<input type="hidden" value="{{$tiendaToken}}" name="tiendaToken" />
-		<input type="hidden" value="{{$tiendaId}}" name="tiendaId" />
-
-		<input type="submit" class="btn btn-primary btn-sm" value="Volver al Inicio">
-	</form>
+<a href="/pluginTN/public/export" class="btn btn-primary btn-sm"> Volver al Inicio </a>
 	
 
 <!-- div>
